@@ -3,12 +3,7 @@ import psycopg2
 import logging
 
 logging.basicConfig(level=logging.INFO, filename="py_log.log",filemode="w",
-                    format="%(asctime)s %(levelname)s %(message)s")
-logging.debug("A DEBUG Message")
-logging.info("An INFO")
-logging.warning("A WARNING")
-logging.error("An ERROR")
-logging.critical("A message of CRITICAL severity")
+                    format="%(asctime)s %(levelname)s %(message)s", encoding='utf-8')
 
 def load_json(file: str) -> list:
     '''load and convert json'''
@@ -47,7 +42,7 @@ def insertion(data: list, table: str, columns: list) -> None:
             counter += 1
         logging.info(f'Sucessfully inserted {counter} rows')
     except (Exception, psycopg2.Error) as error:
-        logging.error(f"Failed to insert records into {table} table. {error}")
+        logging.error(f"Failed to insert records into {table} table. '{error}'")
 
 def get_info(query: str, filename: str, indent: int=4) -> None:
     '''Getting information from database and converting it to JSON file'''

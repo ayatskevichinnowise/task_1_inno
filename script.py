@@ -42,7 +42,7 @@ def insertion(data: list, table: str, columns: list) -> None:
             counter += 1
         logging.info(f'Sucessfully inserted {counter} rows')
     except (Exception, psycopg2.Error) as error:
-        logging.error(f"Failed to insert records into {table} table. '{error}'")
+        logging.error(f"Failed to insert records into {table} table. '{error}'", exc_info=True)
 
 def get_info(query: str, filename: str, indent: int=4) -> None:
     '''Getting information from database and converting it to JSON file'''

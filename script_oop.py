@@ -120,101 +120,107 @@ class Room(Manager_db):
                           '{error}'", exc_info=True)
 
 
-manager = Manager_db()
+def main():
+    manager = Manager_db()
 
-# Make a connection to db
-manager.connection(dbname="python_intro",
-                   user='postgres',
-                   password='1',
-                   host='localhost',
-                   port='5432')
+    # Make a connection to db
+    manager.connection(dbname="python_intro",
+                       user='postgres',
+                       password='1',
+                       host='localhost',
+                       port='5432')
 
-# Getting json
-rooms = Room('rooms.json')
-room_data = rooms.load_json()
+    # Getting json
+    rooms = Room('rooms.json')
+    room_data = rooms.load_json()
 
-students = Student('students.json')
-stud_data = students.load_json()
+    students = Student('students.json')
+    stud_data = students.load_json()
 
-# Insertion data to db
-rooms.insertion(room_data)
-students.insertion(stud_data)
+    # Insertion data to db
+    rooms.insertion(room_data)
+    students.insertion(stud_data)
 
-# list of rooms and count of students in that rooms. 1st query
-query1 = manager.get_info('''
-                          SELECT
-                              r.room_id,
-                              r.room_name,
-                              COUNT(s.student_id) AS count_of_students
-                          FROM rooms r
-                              LEFT JOIN students s USING(room_id)
-                          GROUP BY 1
-                          ORDER BY 1
-                          ''')
-manager.save_file(query1, 'query1')
+    # list of rooms and count of students in that rooms. 1st query
+    query1 = manager.get_info('''
+                            SELECT
+                                r.room_id,
+                                r.room_name,
+                                COUNT(s.student_id) AS count_of_students
+                            FROM rooms r
+                                LEFT JOIN students s USING(room_id)
+                            GROUP BY 1
+                            ORDER BY 1
+                            ''')
+    manager.save_file(query1, 'query1')
 
-# top 5 rooms with the smallest avg age of students in the rooms. 2nd query
-query2 = manager.get_info('''
-                          SELECT
-                              *
-                          FROM (
-                              SELECT
-                                  *,
-                                  ROW_NUMBER() OVER(ORDER BY avg_stud_age)
-                                  AS placement
-                              FROM (
-                                  SELECT
+    # top 5 rooms with the smallest avg age of students in the rooms. 2nd query
+    query2 = manager.get_info('''
+                            SELECT
+                                *
+                            FROM (
+                                SELECT
+                                    *,
+                                    ROW_NUMBER() OVER(ORDER BY avg_stud_age)
+                                    AS placement
+                                FROM (
+                                   SELECT
                                    r.room_id,
                                    r.room_name,
                                    ROUND(AVG(EXTRACT(YEAR FROM s.birthday)), 2)
                                    :: FLOAT AS avg_stud_age
-                                  FROM rooms AS r
+                                   FROM rooms AS r
                                    JOIN students AS s USING(room_id)
-                                GROUP BY 1
-                                ) AS tmp
-                              ) AS tmp2
-                          WHERE placement < 6
-                          ''')
-manager.save_file(query2, 'query2')
+                                   GROUP BY 1
+                                   ) AS tmp
+                                ) AS tmp2
+                            WHERE placement < 6
+                            ''')
+    manager.save_file(query2, 'query2')
 
-# top 5 rooms with the highest difference
-# in age of students in the rooms. 3rd query
-query3 = manager.get_info('''
-                          SELECT
-                            *
-                          FROM (
-                              SELECT
-                                  *,
-                                  ROW_NUMBER() OVER(ORDER BY age_diff DESC)
-                                  AS placement
-                              FROM (
-                                      SELECT
-                                          r.room_id,
-                                          r.room_name,
-                                          MAX(EXTRACT(YEAR FROM s.birthday)) -
-                                          MIN(EXTRACT(YEAR FROM s.birthday))
-                                          :: FLOAT AS age_diff
-                                      FROM rooms AS r
-                                          JOIN students AS s USING(room_id)
-                                      GROUP BY 1
-                                      ) AS tmp
-                              ) AS tmp2
-                          WHERE placement < 6
-                          ''')
-manager.save_file(query3, 'query3')
-
-# list of rooms with different sex in one room. 4th query
-query4 = manager.get_info('''
-                          SELECT room_name
-                          FROM (
+    # top 5 rooms with the highest difference
+    # in age of students in the rooms. 3rd query
+    query3 = manager.get_info('''
+                            SELECT
+                                *
+                            FROM (
                                 SELECT
-                                    r.room_id,
-                                    r.room_name,
-                                    COUNT(DISTINCT s.sex) AS gender_variety
-                                FROM rooms AS r
-                                    JOIN students AS s USING(room_id)
-                                GROUP BY 1
-                                HAVING COUNT(DISTINCT s.sex) > 1
-                                ) AS tmp
-                          ''')
-manager.save_file(query4, 'query4')
+                                    *,
+                                    ROW_NUMBER() OVER(ORDER BY age_diff DESC)
+                                    AS placement
+                                FROM (
+                                        SELECT
+                                           r.room_id,
+                                           r.room_name,
+                                           MAX(EXTRACT(YEAR FROM s.birthday)) -
+                                           MIN(EXTRACT(YEAR FROM s.birthday))
+                                           :: FLOAT AS age_diff
+                                        FROM rooms AS r
+                                           JOIN students AS s USING(room_id)
+                                        GROUP BY 1
+                                        ) AS tmp
+                                ) AS tmp2
+                            WHERE placement < 6
+                            ''')
+    manager.save_file(query3, 'query3')
+
+    # list of rooms with different sex in one room. 4th query
+    query4 = manager.get_info('''
+                            SELECT room_name
+                            FROM (
+                                    SELECT
+                                        r.room_id,
+                                        r.room_name,
+                                        COUNT(DISTINCT s.sex) AS gender_variety
+                                    FROM rooms AS r
+                                        JOIN students AS s USING(room_id)
+                                    GROUP BY 1
+                                    HAVING COUNT(DISTINCT s.sex) > 1
+                                    ) AS tmp
+                            ''')
+    manager.save_file(query4, 'query4')
+
+
+if __name__ == "__main__":
+    main()
+    

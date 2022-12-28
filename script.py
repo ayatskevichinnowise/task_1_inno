@@ -56,16 +56,17 @@ def insertion(data: list, table: str, columns: list) -> None:
                       '{error}'", exc_info=True)
 
 
-def get_info(query: str, filename: str, indent: int = 4) -> None:
+def get_info(query: str, filename: str, indent: int = 4,
+             format: str = 'json') -> None:
     '''Getting information from database and converting it to JSON file'''
     cursor.execute(query)
 
     info_from_db = cursor.fetchall()
 
     # writing to json
-    with open(f"{filename}.json", "w") as file:
+    with open(f"{filename}.{format}", "w") as file:
         file.write(json.dumps(info_from_db, indent=indent))
-    logging.info(f'File {filename}.json succesfully saved')
+    logging.info(f'File {filename}.{format} succesfully saved')
 
 
 def main():
@@ -103,12 +104,14 @@ def main():
                    FROM (
                        SELECT
                            *,
-                           ROW_NUMBER() OVER(ORDER BY avg_stud_age) AS placement
+                           ROW_NUMBER() OVER(ORDER BY avg_stud_age)
+                           AS placement
                        FROM (
                             SELECT
                                 r.room_id,
                                 r.room_name,
-                                ROUND(AVG(EXTRACT(YEAR FROM s.birthday)), 2) :: FLOAT AS avg_stud_age
+                                ROUND(AVG(EXTRACT(YEAR FROM s.birthday)), 2)
+                                :: FLOAT AS avg_stud_age
                             FROM rooms AS r
                                 JOIN students AS s USING(room_id)
                             GROUP BY 1
@@ -126,13 +129,15 @@ def main():
                    FROM (
                        SELECT
                            *,
-                           ROW_NUMBER() OVER(ORDER BY age_diff DESC) AS placement
+                           ROW_NUMBER() OVER(ORDER BY age_diff DESC)
+                           AS placement
                        FROM (
                             SELECT
                                 r.room_id,
                                 r.room_name,
                                 MAX(EXTRACT(YEAR FROM s.birthday)) -
-                                MIN(EXTRACT(YEAR FROM s.birthday)) :: FLOAT AS age_diff
+                                MIN(EXTRACT(YEAR FROM s.birthday))
+                                :: FLOAT AS age_diff
                             FROM rooms AS r
                                 JOIN students AS s USING(room_id)
                             GROUP BY 1

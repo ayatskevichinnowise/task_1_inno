@@ -2,3 +2,5 @@ Pipfile
 *.lock
 *.log
 *.ipynb
+credentials.py
+temp.py

@@ -1,29 +1,48 @@
 from sql.queries import queries
 from services.connection import make_conn
 from services.services import Reader, Writer
-import click as cl
+import click
 
 
-@cl.command
-@cl.option(
-    "-r", "--rooms-path", help="Path to file with data about rooms",
-    type=cl.STRING
+@click.command
+@click.option(
+    "--rooms_path",
+    help="Path to the file with data about rooms",
+    type=click.STRING,
+    default='data\\rooms.json',
+    show_default=True
 )
-@cl.option(
-    "-s",
-    "--stud-path",
-    help="Path to file with data about students",
-    type=cl.STRING,
+@click.option(
+    "--stud_path",
+    help="Path to the file with data about students",
+    type=click.STRING,
+    default='data\\students.json',
+    show_default=True
 )
-@cl.option("-o", "--out-path", type=cl.STRING, help="Output file path")
-@cl.option(
-    "-f",
-    "--out-format",
+@click.option(
+    "--out_path",
+    help="Output file path",
+    type=click.STRING,
+    default='',
+    show_default=True
+    )
+@click.option(
+    "--out_format",
     help="Output file format",
-    type=cl.Choice(["json", "xml"]),
-)
+    type=click.Choice(['json', 'xml']),
+    default='json',
+    show_default=True
+    )
 def main(rooms_path: str, stud_path: str,
-         out_format: str, out_path: str):
+         out_format: str, out_path: str) -> None:
+    '''
+    The main function that gets all dependencies and runs script.
+    :param rooms_path: path to the file with data about rooms
+    :param stud_path: path to the file with data about students
+    :param out_format: save file format (can only be JSON or XML)
+    :param out_path: save file path
+    :return: None
+    '''
     connection = make_conn()
 
     rooms = Writer(connection, 'rooms')

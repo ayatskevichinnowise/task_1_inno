@@ -1,9 +1,8 @@
 import os
 import json
 import logging
-import psycopg2 as pg
-import psycopg2.extras as pgex
-from psycopg2 import sql
+import psycopg as pg
+from psycopg import sql
 from sql.queries import insertion
 from dicttoxml import dicttoxml
 from xml.dom.minidom import parseString
@@ -19,7 +18,7 @@ class Writer:
     '''
     Class that writes information to Postgres database
     '''
-    def __init__(self, connection: pg.extensions.connection,
+    def __init__(self, connection: pg.Connection,
                  table: str):
         self.connection = connection
         self.table = table
@@ -40,12 +39,10 @@ class Writer:
         :data: necessary data for uploading to database
         :return: None
         '''
-        with self.connection as conn:
-            with conn.cursor() as curs:
-                curs.execute(
+        self.connection.execute(
                     sql.SQL(insertion["json_array"]).format(
                      table=sql.Identifier(self.table),
-                     json=sql.Literal(data),
+                     json=sql.Literal(data)
                     )
                 )
         logging.info(f"Wrote data to {self.table} table")
@@ -55,7 +52,7 @@ class Reader:
     '''
     Class that gets information from Postrgres database
     '''
-    def __init__(self, connection: pg.extensions.connection):
+    def __init__(self, connection: pg.Connection):
         self.connection = connection
 
     def get_info(self, query: str) -> list:
@@ -64,10 +61,7 @@ class Reader:
         :param query: query for execution
         :return: result of query as list
         '''
-        with self.connection as conn:
-            with conn.cursor(cursor_factory=pgex.DictCursor) as curs:
-                curs.execute(query)
-                return curs.fetchall()
+        return self.connection.execute(query).fetchall()
 
     def save_file(self, query: str, filename: str,
                   format: str = 'json', out_path: str = '',

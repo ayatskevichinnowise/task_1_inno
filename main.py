@@ -2,6 +2,7 @@ from sql.queries import queries
 from services.connection import make_conn
 from services.services import Reader, Writer
 import click
+from credentials import credentials
 
 
 @click.command
@@ -43,13 +44,17 @@ def main(rooms_path: str, stud_path: str,
     :param out_path: save file path
     :return: None
     '''
-    connection = make_conn()
+    connection = make_conn(dbname=credentials.get('DBNAME'),
+                           user=credentials.get('USER'),
+                           password=credentials.get('PASSWORD'),
+                           host=credentials.get('HOST'),
+                           port=credentials.get('PORT'))
 
     rooms = Writer(connection, 'rooms')
     rooms.write(rooms.get(rooms_path))
 
     stud = Writer(connection, 'students')
-    stud.write(rooms.get(stud_path))
+    stud.write(stud.get(stud_path))
 
     reader = Reader(connection)
     for name, query in queries.items():

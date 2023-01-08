@@ -4,10 +4,10 @@ Script that downloads 2 JSON files and upload information into Postgresql databa
 The script also gets information from database and saves the results of queries in JSON or XML format.
 
 ### Queries: ###
- Markup : 1. List of rooms and number of students in each room
-          2. Top 5 rooms with the smallest average student age
-          3. Top 5 rooms with the biggest difference in student age
-          4. List of rooms where students of different gender
+ 1. List of rooms and number of students in each room
+ 2. Top 5 rooms with the smallest average student age
+ 3. Top 5 rooms with the biggest difference in student age
+ 4. List of rooms where students of different gender
 
 ### Options ###
 

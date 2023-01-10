@@ -4,3 +4,5 @@ Pipfile
 *.ipynb
 credentials.py
 temp.py
+__pycache__
+__pycache__/

@@ -1,17 +1,14 @@
 import os
 import json
 import logging
+import logging.config
 import psycopg as pg
 from psycopg import sql
 from sql.queries import insertion
 from dicttoxml import dicttoxml
 from xml.dom.minidom import parseString
 
-logging.basicConfig(level=logging.INFO,
-                    filename="py_log.log",
-                    filemode="w",
-                    format="%(asctime)s %(levelname)s %(message)s",
-                    encoding='utf-8')
+logging.config.fileConfig(fname="config/logging.conf")
 
 
 class Writer:

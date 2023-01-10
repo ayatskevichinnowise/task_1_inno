@@ -2,7 +2,8 @@ from sql.queries import queries
 from services.connection import make_conn
 from services.services import Reader, Writer
 import click
-from credentials import credentials
+import os
+from dotenv import load_dotenv
 
 
 @click.command
@@ -44,11 +45,12 @@ def main(rooms_path: str, stud_path: str,
     :param out_path: save file path
     :return: None
     '''
-    connection = make_conn(dbname=credentials.get('DBNAME'),
-                           user=credentials.get('USER'),
-                           password=credentials.get('PASSWORD'),
-                           host=credentials.get('HOST'),
-                           port=credentials.get('PORT'))
+    load_dotenv()
+    connection = make_conn(dbname=os.getenv('DBNAME'),
+                           user=os.getenv('USER'),
+                           password=os.getenv('PASSWORD'),
+                           host=os.getenv('HOST'),
+                           port=os.getenv('PORT'))
 
     rooms = Writer(connection, 'rooms')
     rooms.write(rooms.get(rooms_path))

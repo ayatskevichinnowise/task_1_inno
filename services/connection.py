@@ -1,12 +1,9 @@
 import psycopg as pg
 from psycopg.rows import dict_row
 import logging
+import logging.config
 
-logging.basicConfig(level=logging.INFO,
-                    filename="py_log.log",
-                    filemode="w",
-                    format="%(asctime)s %(levelname)s %(message)s",
-                    encoding='utf-8')
+logging.config.fileConfig(fname="config/logging.conf")
 
 
 def make_conn(dbname: str, user: str,
